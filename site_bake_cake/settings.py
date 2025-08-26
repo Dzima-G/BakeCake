@@ -1,6 +1,6 @@
 import os
-
 from pathlib import Path
+
 from environs import Env
 
 env = Env()
@@ -13,7 +13,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env.bool('DEBUG', False)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', ['127.0.0.1', 'localhost'])
 
-# AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'storage',
     'users',
+    'phonenumber_field',
 ]
 
 MIDDLEWARE = [
