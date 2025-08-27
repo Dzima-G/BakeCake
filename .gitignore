@@ -178,3 +178,5 @@ cython_debug/
 
 .idea
 .gitattributes
+/db/
+/staticfiles/

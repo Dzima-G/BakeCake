@@ -40,4 +40,4 @@ class CustomUser(AbstractUser):
         verbose_name_plural = 'Клиенты'
 
     def __str__(self):
-        return f'{self.first_name or ''} ({self.phone})'
+        return f'{self.first_name or ""} ({self.phone})'
