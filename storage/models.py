@@ -124,6 +124,13 @@ class Cake(models.Model):
         max_length=75,
         blank=True
     )
+    price = models.DecimalField(
+        verbose_name='стоимость',
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+        validators=[MinValueValidator(0)]
+    )
 
     class Meta:
         verbose_name = 'торт'
@@ -131,6 +138,25 @@ class Cake(models.Model):
 
     def __str__(self):
         return f'{self.form} {self.levels}-слойный, топпинг - {self.topping}'
+
+    def save(self, *args, **kwargs):
+
+        total = (
+            self.levels.price +
+            self.form.price +
+            self.topping.price
+        )
+
+        if self.berries:
+            total += self.berries.price
+        if self.decorations:
+            total += self.decorations.price
+
+        if self.text:
+            total += 500
+
+        self.price = total
+        super().save(*args, **kwargs)
 
 
 class Courier(models.Model):
@@ -186,3 +212,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.cake} - {self.address}'
+
+    def save(self, *args, **kwargs):
+
+        if not self.cost and self.cake:
+            self.cost = self.cake.price
+        super().save(*args, **kwargs)
