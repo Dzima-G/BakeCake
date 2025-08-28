@@ -63,9 +63,9 @@ class CourierAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['user', 'address', 'order_notes']
+    list_display = ['user', 'address', 'order_notes', 'cost']
     list_filter = ['delivery_date', 'courier']
-    readonly_fields = ['created_at']
+    readonly_fields = ['cost', 'created_at']
 
     fieldsets = (
         ('Информация о заказе', {

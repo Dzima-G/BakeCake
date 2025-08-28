@@ -132,6 +132,13 @@ class Cake(models.Model):
         validators=[MinValueValidator(0)]
     )
 
+    class Meta:
+        verbose_name = 'торт'
+        verbose_name_plural = 'торты'
+
+    def __str__(self):
+        return f'{self.form} {self.levels}-слойный, топпинг - {self.topping}'
+
     def save(self, *args, **kwargs):
 
         total = (
@@ -150,13 +157,6 @@ class Cake(models.Model):
 
         self.price = total
         super().save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = 'торт'
-        verbose_name_plural = 'торты'
-
-    def __str__(self):
-        return f'{self.form} {self.levels}-слойный, топпинг - {self.topping}'
 
 
 class Courier(models.Model):
@@ -212,3 +212,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f'{self.cake} - {self.address}'
+
+    def save(self, *args, **kwargs):
+
+        if not self.cost and self.cake:
+            self.cost = self.cake.price
+        super().save(*args, **kwargs)
