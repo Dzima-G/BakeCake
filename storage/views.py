@@ -1,16 +1,12 @@
-from django.shortcuts import render
-from .models import Cake, Order
+from datetime import datetime
 
+from django.contrib.auth import login
+from django.http import JsonResponse
+from django.shortcuts import render, redirect
 
-def index(request):
-    cakes = Cake.objects.filter(is_show=True).order_by('id')[:3]
-
-    return render(
-        request,
-        'index.html',
-        {
-            'cakes': cakes,
-        })
+from users.forms import SignupForm, LoginForm
+from .forms import CakeForm
+from .models import Level, Form, Topping, Berry, Decoration, Cake, Order, CustomUser
 
 
 def lk_user(request):
@@ -45,3 +41,92 @@ def catalog(request):
         {
             'cakes': cakes,
         })
+
+
+def index(request):
+    cakes = Cake.objects.filter(is_show=True).order_by('id')[:3]
+    order = None
+    signup_form = SignupForm()
+    login_form = LoginForm()
+
+    if request.method == 'POST':
+        form = CakeForm(request.POST)
+        if form.is_valid():
+            cake = form.save()
+            order = Order.objects.create(
+                user=request.user if request.user.is_authenticated else None,
+                cake=cake,
+                address=request.POST.get('address', ''),
+                order_notes=request.POST.get('order_notes', ''),
+                delivery_notes=request.POST.get('delivery_notes', ''),
+                delivery_date=request.POST.get('delivery_date'),
+                delivery_time=request.POST.get('delivery_time'),
+                cost=cake.price
+            )
+            form = CakeForm()
+    else:
+        form = CakeForm()
+
+    context = {
+        'form': form,
+        'levels': Level.objects.all(),
+        'forms': Form.objects.all(),
+        'toppings': Topping.objects.all(),
+        'berries': Berry.objects.all(),
+        'decorations': Decoration.objects.all(),
+        'order': order,
+        'signup_form': signup_form,
+        'login_form': login_form,
+        'cakes': cakes,
+    }
+    return render(
+        request,
+        'index.html',
+        context
+    )
+
+
+def create_order(request):
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'message': 'Неверный метод'}, status=405)
+
+    # 1. Собираем торт
+    cake_form = CakeForm(request.POST)
+    if not cake_form.is_valid():
+        return JsonResponse({'ok': False, 'message': 'Ошибка в данных торта', 'errors': cake_form.errors}, status=400)
+    cake = cake_form.save()
+
+    # 2. Если пользователь не авторизован — регистрируем его
+    if not request.user.is_authenticated:
+        signup_form = SignupForm(request.POST)
+        if not signup_form.is_valid():
+            return JsonResponse({'ok': False, 'message': 'Ошибка регистрации', 'errors': signup_form.errors},
+                                status=400)
+        user = CustomUser.objects.create_user(
+            phone=signup_form.cleaned_data['phone'],
+            first_name=signup_form.cleaned_data.get('first_name', ''),
+            email=signup_form.cleaned_data.get('email', ''),
+            password=signup_form.cleaned_data['password1'],
+        )
+        login(request, user)
+    else:
+        user = request.user
+
+    delivery_date_str = request.POST.get('delivery_date')
+    delivery_time_str = request.POST.get('delivery_time')
+    delivery_date = datetime.strptime(delivery_date_str, '%Y-%m-%d').date() if delivery_date_str else None
+    delivery_time = datetime.strptime(delivery_time_str, '%H:%M').time() if delivery_time_str else None
+
+    # 3. Создаём заказ
+    order = Order.objects.create(
+        user=user,
+        cake=cake,
+        address=request.POST.get('address', ''),
+        order_notes=request.POST.get('order_notes', ''),
+        delivery_notes=request.POST.get('delivery_notes', ''),
+        delivery_date=delivery_date,
+        delivery_time=delivery_time,
+        cost=cake.price,
+    )
+
+    return redirect('storage:index')
