@@ -164,13 +164,6 @@ class Cake(models.Model):
         null=True,
         verbose_name='отображение'
     )
-    price = models.DecimalField(
-        verbose_name='стоимость',
-        max_digits=10,
-        decimal_places=2,
-        default=0,
-        validators=[MinValueValidator(0)]
-    )
 
     class Meta:
         verbose_name = 'торт'
@@ -185,25 +178,6 @@ class Cake(models.Model):
                 self.levels.price +
                 self.form.price +
                 self.topping.price
-        )
-
-        if self.berries:
-            total += self.berries.price
-        if self.decorations:
-            total += self.decorations.price
-
-        if self.text:
-            total += 500
-
-        self.price = total
-        super().save(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-
-        total = (
-            self.levels.price +
-            self.form.price +
-            self.topping.price
         )
 
         if self.berries:
@@ -336,10 +310,4 @@ class Order(models.Model):
             if timedelta(0) < delta <= timedelta(hours=24):
                 self.cost = (self.cost or Decimal('0')) * Decimal('1.2')
 
-        super().save(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-
-        if not self.cost and self.cake:
-            self.cost = self.cake.price
         super().save(*args, **kwargs)
