@@ -6,10 +6,11 @@ from .models import Level, Form, Topping, Berry, Decoration, Cake, Courier, Orde
 @admin.register(Cake)
 class CakeAdmin(admin.ModelAdmin):
     list_display = [
-        'id',
+        'name',
         'form',
         'levels',
         'topping',
+        'is_show',
         'text'
     ]
 
@@ -69,7 +70,7 @@ class OrderAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Информация о заказе', {
-            'fields': ('user', 'cake', 'courier', 'cost'),
+            'fields': ('status', 'user', 'cake', 'courier', 'cost'),
             'description': 'Основные данные заказа'
         }),
         ('Доставка', {

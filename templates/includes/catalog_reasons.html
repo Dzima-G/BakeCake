@@ -1,0 +1,38 @@
+{% load static %}
+<article class="row pt-header d-flex justify-content-center" id="step2">
+    <h2 class="font_Gogh fs_40 cake_blue text-center mb-3">Наши торты</h2>
+
+    {% for cake in cakes %}
+
+        <div class="col-12 col-sm-6 col-lg-4 d-flex flex-column align-items-center">
+            <div class="card border-0 cake__hover">
+                <img src="{{ cake.image.url }}" alt="{{ cake.name }}" class="">
+                <span class="cake_blue mt-4 fw-lighter mb-4 text-center lk__order" data-bs-toggle="modal"
+                      data-bs-target="#extendModal{{ cake.id }}">{{ cake.name }}</span>
+                <span class="mt-4 fw-lighter mb-4 text-center">{{ cake.price }} руб.</span>
+            </div>
+        </div>
+        <aside class="modal fade" id="extendModal{{ cake.id }}" tabindex="-1"
+               aria-labelledby="extendModalLabel{{ cake.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title cake_pink" id="extendModalLabel{{ cake.id }}">
+                            {{ cake.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <span class="cake_blue">Уровней: {{ cake.levels }}</span><br>
+                        <span class="cake_blue">Форма: {{ cake.form }}</span><br>
+                        <span class="cake_blue">Топпинг: {{ cake.topping }}</span><br>
+                        <span class="cake_blue">Ягоды: {{ cake.berries_label }}</span><br>
+                        <span class="cake_blue">Декор: {{ cake.decorations_label }}</span><br>
+                        <span class="cake_blue">Надпись: {{ cake.text_label }}</span><br>
+                        <span class="cake_pink">Цена: {{ cake.price }} руб.</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    {% endfor %}
+</article>

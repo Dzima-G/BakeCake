@@ -1,38 +1,83 @@
-{% verbatim %}
-<aside class="modal fade" id="RegModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="RegModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content px-4 cake__modal">
-      <div class="modal-header border-0 pb-0 pt-4">
-        <button @click="Reset" type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-header border-0 py-0">
-        <label for="reg" class="modal-title font_Gogh fs_40 cake_blue" id="RegModalLabel">Вход / Регистрация</label>
-      </div>
-      <form class="d-none">
-        <input v-model="RegInput" type="text" name="REG">
-        <button type="submit" ref="HiddenFormSubmitReg">reg</button>
-      </form>
-      <v-form :validation-schema="RegSchema" class="modal-body position-relative d-flex flex-column align-items-center px-5 pb-4" @submit="RegSubmit">
-        <v-field v-if="RegInput !== 'Регистрация успешна'" v-model="RegInput" name="reg" type="text" id="reg" :placeholder="Step === `Number` ? `Введите ваш номер` : `Введите код`" class="form-control cake__textinput"></v-field>
-        <v-field v-if="Step === 'Number'" v-model="RegInput" type="phone" name="phone_format" class="d-none"></v-field>
-        <v-field v-if="Step === 'Code'" v-model="RegInput" type="phone" name="code_format" class="d-none"></v-field>
-        <button v-if="RegInput !== 'Регистрация успешна'" type="submit" class="btn text-white w-100 rounded-pill mt-3 py-2 shadow-none cake__button fs_12 cake__bg_pink">Отправить</button>
-        <span v-if="RegInput === 'Регистрация успешна'" class="cake_grey text-center">Регистрация успешна</span>
-        <small class="fs_12 cake_pink text-center position-absolute bottom-0"><error-message name="reg">
-          <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" class="bi bi-exclamation-circle mb-1" viewBox="0 0 16 16">
-            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
-          </svg>
-          {{Step === 'Number' ? 'Введите номер' : 'Введите код'}}</error-message></small>
-        <error-message name="phone_format" class="fs_12 cake_pink text-center position-absolute bottom-0"></error-message>
-        <error-message name="code_format" class="fs_12 cake_pink text-center position-absolute bottom-0"></error-message>
-      </v-form>
+{% load static %}
+<aside class="modal fade" id="RegModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+       aria-labelledby="RegModalLabel" aria-hidden="true">
+    {% if user.is_authenticated %}
+    {% else %}
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content my-modal px-4">
+                <div class="modal-header border-0 pb-0 pt-4">
+                    <button type="button" class="btn-close border rounded-pill" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
 
-      <div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
-        <p class="fs_12 cake_grey">{{Step === `Number` ? `Нажимая на кнопку, вы соглашаетесь на обработку персональных данных в соответствии с политикой конфиденциальности` : Step === 'Code' ? `Осталось времени: 05:00` : ``}}</p>
-        <a href="#" v-if="Step === `Code`" @click.prevent="ToRegStep1" class="text-decoration-none cake_pink fs_12">изменить данные</a>
-      </div>
-    </div>
-  </div>
+                <!-- Навигация вкладок -->
+                <div class="text-center mb-3">
+                    <a id="tab-login" href="#" data-bs-toggle="tab" data-bs-target="#pane-login" role="tab"
+                       aria-controls="pane-login" aria-selected="true"
+                       class="cake_blue font_Gogh fs_40 modal-title text-decoration-none">Вход</a>
+                    <span class="mx-2 cake_grey modal-title font_Gogh fs_40">/</span>
+                    <a id="tab-register" href="#" data-bs-toggle="tab" data-bs-target="#pane-register" role="tab"
+                       aria-controls="pane-register" aria-selected="false"
+                       class="cake_grey font_Gogh fs_40 modal-title text-decoration-none">Регистрация</a>
+                </div>
+
+                <!-- Контент вкладок -->
+                <div class="tab-content">
+
+                    <!-- Вкладка: Вход -->
+                    <div class="tab-pane fade show active" id="pane-login" role="tabpanel" aria-labelledby="tab-login"
+                         tabindex="0">
+                        <form method="post" action="{% url 'users:login' %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <input name="phone" type="text" class="form-control cake__textinput"
+                                       placeholder="Телефон" required>
+                                <input name="password" type="password" class="form-control cake__textinput mt-2"
+                                       placeholder="Пароль" required>
+                                <button type="submit"
+                                        class="btn cake__button cake__bg_pink text-white w-100 rounded-pill mt-3">
+                                    Войти
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Вкладка: Регистрация -->
+                    <div class="tab-pane fade" id="pane-register" role="tabpanel" aria-labelledby="tab-register"
+                         tabindex="0">
+                        <form method="post" action="{% url 'users:register' %}">
+                            {% csrf_token %}
+                            <div class="modal-body">
+                                <input name="phone" type="text" class="form-control cake__textinput"
+                                       placeholder="Телефон" required>
+                                <input name="first_name" type="text" class="form-control cake__textinput mt-2"
+                                       placeholder="Имя">
+                                <input name="email" type="email" class="form-control cake__textinput mt-2"
+                                       placeholder="Email">
+                                <input name="password1" type="password" class="form-control cake__textinput mt-2"
+                                       placeholder="Пароль" required>
+                                <input name="password2" type="password" class="form-control cake__textinput mt-2"
+                                       placeholder="Повторите пароль" required>
+                                <button type="submit"
+                                        class="btn cake__button cake__bg_pink text-white w-100 rounded-pill mt-3">
+                                    Зарегистрироваться
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer d-flex flex-column justify-content-between align-items-center text-center border-0 mx-5">
+                    <p class="fs_12 cake_grey">
+                        Нажимая на кнопку, вы
+                        <a href="{% static 'Consent to the processing of personal data.pdf' %}" class="fs_12 cake_grey">
+                            соглашаетесь на обработку персональных данных
+                        </a>
+                        в соответствии с политикой конфиденциальности
+                    </p>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 </aside>
-{% endverbatim %}

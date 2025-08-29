@@ -2,84 +2,110 @@
     font-family: Gogh;
     src: url('./fonts/Gogh-ExtraBold.otf');
 }
+
 @font-face {
     font-family: Garet;
     src: url('./fonts/Garet-Book.ttf');
 }
+
 .font_Gogh {
     font-family: Gogh;
 }
+
 html {
     height: 100%;
 }
+
 * {
     font-family: Garet, serif;
     font-size: 16px;
     font-weight: normal;
 }
+
 body {
     background-color: white;
     min-height: 100%;
     display: grid;
     grid-template-rows: auto 1fr auto;
 }
+
 .mt-header {
     margin-top: calc(58px + 1.6rem);
 }
+
 .pt-header {
     padding-top: calc(58px + 1.6rem);
 }
+
 .cake_pink {
     color: #DA87A9 !important;
 }
+
 .cake__bg_pink {
     background-color: #DA87A9 !important;
 }
+
 .cake_blue {
     color: #5882CD !important;
 }
+
+.cake_green {
+    color: #276b57 !important;
+}
+
 .cake__bg_blue {
     background-color: #5882CD !important;
 }
+
 .cake__border_blue {
     border-color: #5882CD !important;
 }
+
 .cake_grey {
     color: #8C99AA !important;
 }
+
 .cake__hover:hover span {
     color: #DA87A9 !important;
 }
+
 .cake__button {
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25) !important;
     border-radius: 15px;
 }
+
 .cake__button:hover {
     box-shadow: none !important;
 }
+
 .cake__label {
     border: 1px solid white;
     border-radius: 15px;
 }
+
 .cake__label:hover {
     border: 1px solid #5882CD;
     color: #5882CD !important;
 }
+
 .cake__textinput {
     border: 1px solid #8C99AA;
     border-radius: 15px;
     color: #5882CD !important;
 }
+
 li .cake__textinput:read-only {
     box-shadow: none;
     border: 1px solid white;
     background-color: white;
     color: #5882CD;
 }
+
 .cake__input:checked + .cake__label {
     border: 1px solid #5882CD;
     color: #DA87A9 !important;
 }
+
 .cake__card {
     z-index: -1;
     border: 1px solid #8C99AA;
@@ -88,6 +114,7 @@ li .cake__textinput:read-only {
     flex-direction: column;
     max-width: 255px;
 }
+
 .cake__badge {
     position: absolute;
     border: 1px solid #8C99AA;
@@ -98,38 +125,138 @@ li .cake__textinput:read-only {
     font-size: 12px;
     padding-left: 4px;
 }
+
 .cake__modal {
     border: none;
-    max-width: 593px;
-    height: 310px;
+    max-width: 600px;
+    height: 400px;
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
     border-radius: 15px;
 }
+
+.cake__modal-content-ls {
+    border: none;
+    max-width: 600px;
+    height: 550px;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+}
+
 .from__alert:not(:last-child):after {
     content: ',';
 }
+
 .from__alert:first-child:before {
     content: '⚠ Необходимо выбрать ';
 }
+
 .lk__order {
     cursor: pointer;
 }
+
 .lk__order:hover {
     color: #DA87A9 !important;
 }
+
 .fs_8 {
     font-size: 8px;
 }
+
 .fs_12 {
     font-size: 12px;
 }
+
+.fs_16 {
+    font-size: 16px;
+}
+
+.fs_20 {
+    font-size: 20px;
+}
+
 .fs_40 {
     font-size: 40px;
 }
+
+.my-text-size {
+    font-size: 20px;
+    font-weight: 700;
+}
+
 .py-61 {
     padding-top: 0.61rem;
     padding-bottom: 0.61rem;
 }
+
 .z-index-1 {
     z-index: -1;
+}
+
+.auth-error {
+    color: #cb2a21;
+    font-size: 16px;
+}
+
+.auth-success {
+    color: #1a6718;
+    font-size: 16px;
+}
+
+.my-modal {
+    border-radius: 15px;
+}
+
+.user-n {
+    color: #5882CD !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    text-decoration: none;
+}
+
+#edit-block.profile-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 12px;
+}
+
+#edit-block .profile-label {
+    margin: 0;
+    white-space: nowrap;
+}
+
+#edit-block .profile-input {
+    width: 100%;
+    max-width: 800px;
+}
+
+@media (max-width: 576px) {
+    #edit-block.profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    #edit-block .profile-label {
+        margin-bottom: 6px;
+    }
+}
+
+.mb-1 {
+    margin-bottom: .25rem !important;
+}
+
+.mt-1 {
+    margin-top: .25rem !important;
+}
+
+.pb-1 {
+    padding-bottom: .25rem !important;
+}
+
+.pt-1 {
+    padding-top: .25rem !important;
+}
+
+.text-dec {
+    text-decoration: none;
 }

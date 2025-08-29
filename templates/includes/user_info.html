@@ -1,0 +1,167 @@
+{% load static %}
+<div class="container mt-header">
+    <div class="container mt-header mb-5">
+        <div class="row mt-5">
+            <div class="col-12 col-xxl-6 d-flex justify-content-center">
+                <div><img src="{% static 'img/Cake2.png' %}" alt=""></div>
+            </div>
+            <div class="col-12 col-xxl-6 d-flex flex-column justify-content-center align-items-center align-items-xxl-start"
+                 id="LK">
+                <div class="d-flex w-100 justify-content-center justify-content-xxl-between align-items-center">
+                    <h1 class="font_Gogh fs_40 cake_blue">Личный кабинет</h1>
+                    <button type="button" class="btn shadow-none align-self-center" id="btn-edit">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" fill="#DA87A9"
+                             style="border-bottom: #DA87A9 2px solid" class="bi bi-pencil-fill" viewBox="0 0 16 16">
+                            <path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/>
+                        </svg>
+                    </button>
+                    <button type="submit"
+                            form="profile-form"
+                            class="btn shadow-none align-self-center"
+                            id="btn-save"
+                            style="display:none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" fill="#DA87A9"
+                             style="border-bottom:#DA87A9 2px solid" class="bi bi-check-lg" viewBox="0 0 16 16">
+                            <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
+                        </svg>
+                    </button>
+                    <button class="btn shadow-none align-self-center" id="btn-cancel" style="display:none">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="27" height="27" viewBox="0 0 24 24"
+                             style="border-bottom:#DA87A9 2px solid">
+                            <line x1="5" y1="5" x2="19" y2="19" stroke="#DA87A9" stroke-width="2"
+                                  stroke-linecap="round"/>
+                            <line x1="19" y1="5" x2="5" y2="19" stroke="#DA87A9" stroke-width="2"
+                                  stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="profile-form" method="post" action="{% url 'users:profile_update' %}">
+                    {% csrf_token %}
+
+                    <!-- Режим ПРОСМОТРА (как текст) -->
+                    <div id="view-block">
+                        <div class="fs_16 cake_blue mb-1">Имя: <span
+                                id="v_first_name">{{ user.first_name|default:"—" }}</span></div>
+                        <div class="fs_16 cake_blue mb-1">Телефон: <span id="v_phone">{{ user.phone }}</span></div>
+                        <div class="fs_16 cake_blue mb-1">E-mail: <span id="v_email">{{ user.email|default:"—" }}</span>
+                        </div>
+                        <div class="fs_16 cake_blue mb-1">Пароль: ********</div>
+                    </div>
+
+                    <!-- Режим РЕДАКТИРОВАНИЯ (показывается по кнопке) -->
+                    <div id="edit-block" class="profile-grid" style="display:none">
+                        <label class="fs_20 cake_blue profile-label" for="FIRST_NAME">Имя:</label>
+                        <input type="text" name="first_name" id="FIRST_NAME" class="fs_16 cake_blue profile-input"
+                               value="{{ user.first_name|default_if_none:'' }}">
+
+                        <label class="fs_20 cake_blue profile-label" for="PHONE">Телефон:</label>
+                        <input type="tel" name="phone" id="PHONE" class="fs_16 cake_blue profile-input"
+                               value="{{ user.phone }}">
+
+                        <label class="fs_20 cake_blue profile-label" for="EMAIL">E-mail:</label>
+                        <input type="email" name="email" id="EMAIL" class="fs_16 cake_blue profile-input"
+                               value="{{ user.email|default_if_none:'' }}">
+
+                        <label class="fs_20 cake_blue profile-label" for="PASSWORD">Пароль</label>
+                        <input type="password" name="password" id="PASSWORD" class="fs_16 cake_blue profile-input"
+                               placeholder="необязательно">
+                    </div>
+                    <script>
+                        const vBlock = document.getElementById('view-block');
+                        const eBlock = document.getElementById('edit-block');
+                        const btnEdit = document.getElementById('btn-edit');
+                        const btnSave = document.getElementById('btn-save');
+                        const btnCancel = document.getElementById('btn-cancel');
+
+                        function toEdit() {
+                            vBlock.style.display = 'none';
+                            eBlock.style.display = '';
+                            btnEdit.style.display = 'none';
+                            btnSave.style.display = '';
+                            btnCancel.style.display = '';
+                        }
+
+                        function toView() {
+                            eBlock.style.display = 'none';
+                            vBlock.style.display = '';
+                            btnEdit.style.display = '';
+                            btnSave.style.display = 'none';
+                            btnCancel.style.display = 'none';
+                            // обновим текст в блоке просмотра (если поля изменили, но не отправили)
+                            document.getElementById('v_first_name').textContent = document.getElementById('FIRST_NAME').value || '—';
+                            document.getElementById('v_phone').textContent = document.getElementById('PHONE').value || '';
+                            document.getElementById('v_email').textContent = document.getElementById('EMAIL').value || '—';
+                        }
+
+                        btnEdit.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            toEdit();
+                        });
+                        btnCancel.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            toView();
+                        });
+                    </script>
+                </form>
+
+                {% if has_orders %}
+                    <h2 class="fs_40 cake_pink mt-5">Мои заказы</h2>
+                    {% for order in orders %}
+                        <section class="my-2">
+                            <span class="cake_blue lk__order d-flex" data-bs-toggle="modal"
+                                  data-bs-target="#extendModal{{ order.id }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor"
+                                     class="bi bi-clock-fill" viewBox="0 0 16 16">
+                                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/>
+                                </svg>
+                                <span class="ms-1">#{{ order.id }}  {{ order.cake.name }} </span>
+                            </span>
+                            <aside class="modal fade" id="extendModal{{ order.id }}" tabindex="-1"
+                                   aria-labelledby="extendModalLabel{{ order.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title cake_pink" id="extendModalLabel{{ order.id }}">
+                                                #{{ order.id }} {{ order.cake.name }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <span class="cake_blue">Уровней: {{ order.cake.levels }}</span><br>
+                                            <span class="cake_blue">Форма: {{ order.cake.form }}</span><br>
+                                            <span class="cake_blue">Топпинг: {{ order.cake.topping }}</span><br>
+                                            <span class="cake_blue">Ягоды: {{ order.berries_label }}</span><br>
+                                            <span class="cake_blue">Декор: {{ order.decorations_label }}</span><br>
+                                            <span class="cake_blue">Надпись: {{ order.text_label }}</span><br>
+                                            <span class="cake_pink">Цена: {{ order.cake.price }}₽</span>
+                                        </div>
+                                        <div class="modal-footer d-flex justify-content-between">
+                                            <span class="cake_blue d-flex">Статус: {{ order.get_status_display }}</span>
+                                            <span class="cake_blue d-flex align-items-center">Время доставки: {{ order.delivery_date }} до {{ order.delivery_time }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
+                        </section>
+                    {% endfor %}
+                {% else %}
+                    <span class="cake_grey">У вас еще нет заказов.</span>
+                {% endif %}
+                <p class="cake_grey">Вы можете добавить торт из <a href="{% url 'storage:catalog' %}"
+                                                                   class="text-decoration-none cake_pink">Каталога</a>
+                    или <a href="{% url 'storage:catalog' %}" class="text-decoration-none cake_pink">Создать свой</a>.
+                </p>
+                <span class="cake_grey">Есть вопросы?</span>
+                <span class="cake_grey">Воспользуйтесь нашим <a href="https://vk.com/devmanorg"
+                                                                class="text-decoration-none cake_pink">чат-ботом</a>.</span>
+                <a href="{% url 'users:logout' %}">
+                    <button class="btn text-white rounded-pill align-self-end px-5 mt-3 shadow-none cake__button cake__bg_pink">
+                        Выйти
+                    </button>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<img src="{% static 'img/shopping-cart.svg' %}" alt="">
