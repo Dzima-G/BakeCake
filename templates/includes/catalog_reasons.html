@@ -30,6 +30,45 @@
                         <span class="cake_blue">Декор: {{ cake.decorations_label }}</span><br>
                         <span class="cake_blue">Надпись: {{ cake.text_label }}</span><br>
                         <span class="cake_pink">Цена: {{ cake.price }} руб.</span>
+                        
+                        <form id="order-form-{{ cake.id }}" method="post" action="{% url 'storage:create_order_catalog' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="cake_id" value="{{ cake.id }}">      
+                            <h5 class="cake_blue mb-3 mt-3">Данные для доставки</h5>
+                            
+                            <div class="mb-3">
+                                <label class="form-label cake_blue">Адрес доставки</label>
+                                <input type="text" name="address" class="form-control cake-input" placeholder="Укажите адрес доставки" required>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label cake_blue">Дата доставки</label>
+                                    <input type="date" name="delivery_date" class="form-control cake-input" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label cake_blue">Время доставки</label>
+                                    <input type="time" name="delivery_time" class="form-control cake-input" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label class="form-label cake_blue">Надпись на торте - Стоимость 500₽</label>
+                                <input type="text" name="text" class="form-control cake-input" 
+                                       placeholder="Например: «С днем рождения!»" value="{{ cake.text|default:'' }}">
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="form-label cake_blue">Комментарий к заказу</label>
+                                <textarea name="order_notes" rows="2" class="form-control cake-input" placeholder="Ваши пожелания..."></textarea>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn text-white rounded-pill mt-3 shadow-none cake__button cake__bg_pink">
+                                    Заказать
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
