@@ -1,13 +1,14 @@
 {% load static %}
 <section id="step2">
     <article class="row pt-header d-flex justify-content-center">
-        <h2 class="font_Gogh fs_40 cake_blue text-center mb-3">По любому поводу</h2>
+        <h2 class="font_Gogh fs_40 cake_blue text-center mb-3">Торты</h2>
 
         {% for cake in cakes %}
             <div class="col-12 col-sm-6 col-lg-4 d-flex flex-column align-items-center">
                 <div class="card border-0 cake__hover">
                     <img src="{{ cake.image.url }}" alt="{{ cake.name }}" class="">
                     <span class="cake_blue mt-4 fw-lighter mb-4 text-center">{{ cake.name }}</span>
+                    <span class="mt-4 fw-lighter mb-4 text-center">{{ cake.price }} руб.</span>
                 </div>
             </div>
         {% endfor %}
