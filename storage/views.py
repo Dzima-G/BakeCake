@@ -129,3 +129,73 @@ def create_order(request):
         cost=cake.price,
     )
     return redirect('storage:lk_user')
+
+
+def create_order_catalog(request):
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'message': 'Неверный метод'}, status=405)
+
+    # Если пользователь не авторизован — регистрируем его
+    if not request.user.is_authenticated:
+        signup_form = SignupForm(request.POST)
+        if not signup_form.is_valid():
+            return JsonResponse({'ok': False, 'message': 'Ошибка регистрации', 'errors': signup_form.errors},
+                                status=400)
+        user = CustomUser.objects.create_user(
+            phone=signup_form.cleaned_data['phone'],
+            first_name=signup_form.cleaned_data.get('first_name', ''),
+            email=signup_form.cleaned_data.get('email', ''),
+            password=signup_form.cleaned_data['password1'],
+        )
+        login(request, user)
+    else:
+        user = request.user
+
+    # Получаем оригинальный торт из каталога по ID
+    cake_id = request.POST.get('cake_id')
+    try:
+        original_cake = Cake.objects.get(id=cake_id)
+    except Cake.DoesNotExist:
+        return JsonResponse({'ok': False, 'message': 'Торт не найден'}, status=400)
+
+    # Создаем кастомную копию торта
+    text = request.POST.get('text', '').strip()
+    final_price = original_cake.price
+
+    if text:
+        custom_cake = Cake.objects.create(
+            levels=original_cake.levels,
+            form=original_cake.form,
+            topping=original_cake.topping,
+            berries=original_cake.berries,
+            decorations=original_cake.decorations,
+            text=text,
+            price=original_cake.price + 500,
+            name=f"{original_cake.name} (Кастом)"
+        )
+        final_cake = custom_cake
+        final_price = custom_cake.price
+    else:
+        final_cake = original_cake
+        final_price = original_cake.price
+
+    # Обработка даты и времени
+    delivery_date_str = request.POST.get('delivery_date')
+    delivery_time_str = request.POST.get('delivery_time')
+
+    delivery_date = datetime.strptime(delivery_date_str, '%Y-%m-%d').date() if delivery_date_str else None
+    delivery_time = datetime.strptime(delivery_time_str, '%H:%M').time() if delivery_time_str else None
+
+    # Создаём заказ
+    order = Order.objects.create(
+        user=user,
+        cake=final_cake,
+        address=request.POST.get('address', ''),
+        order_notes=request.POST.get('order_notes', ''),
+        delivery_notes=request.POST.get('delivery_notes', ''),
+        delivery_date=delivery_date,
+        delivery_time=delivery_time,
+        cost=final_price,
+    )
+
+    return redirect('storage:lk_user')
