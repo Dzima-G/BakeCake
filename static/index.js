@@ -1,148 +1,112 @@
 Vue.createApp({
     name: "App",
-    components: {
-        VForm: VeeValidate.Form,
-        VField: VeeValidate.Field,
-        ErrorMessage: VeeValidate.ErrorMessage,
-    },
     data() {
         return {
-            schema1: {
-                lvls: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' количество уровней';
-                },
-                form: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' форму торта';
-                },
-                topping: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' топпинг';
-                }
-            },
-            schema2: {
-                name: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' имя';
-                },
-                phone: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' телефон';
-                },
-                name_format: (value) => {
-                    const regex = /^[a-zA-Zа-яА-Я]+$/
-                    if (!value) {
-                        return true;
-                    }
-                    if ( !regex.test(value)) {
-
-                        return '⚠ Формат имени нарушен';
-                    }
-                    return true;
-                },
-                email_format: (value) => {
-                    const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i
-                    if (!value) {
-                        return true;
-                    }
-                    if ( !regex.test(value)) {
-
-                        return '⚠ Формат почты нарушен';
-                    }
-                    return true;
-                },
-                phone_format:(value) => {
-                    const regex = /^((8|\+7)[\- ]?)?(\(?\d{3}\)?[\- ]?)?[\d\- ]{7,10}$/
-                    if (!value) {
-                        return true;
-                    }
-                    if ( !regex.test(value)) {
-
-                        return '⚠ Формат телефона нарушен';
-                    }
-                    return true;
-                },
-                email: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' почту';
-                },
-                address: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' адрес';
-                },
-                date: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' дату доставки';
-                },
-                time: (value) => {
-                    if (value) {
-                        return true;
-                    }
-                    return ' время доставки';
-                }
-            },
-            DATA: {
-                Levels: ['не выбрано', '1', '2', '3'],
-                Forms: ['не выбрано', 'Круг', 'Квадрат', 'Прямоугольник'],
-                Toppings: ['не выбрано', 'Без', 'Белый соус', 'Карамельный', 'Кленовый', 'Черничный', 'Молочный шоколад', 'Клубничный'],
-                Berries: ['нет', 'Ежевика', 'Малина', 'Голубика', 'Клубника'],
-                Decors: [ 'нет', 'Фисташки', 'Безе', 'Фундук', 'Пекан', 'Маршмеллоу', 'Марципан']
-            },
-            Costs: {
-                Levels: [0, 400, 750, 1100],
-                Forms: [0, 600, 400, 1000],
-                Toppings: [0, 0, 200, 180, 200, 300, 350, 200],
-                Berries: [0, 400, 300, 450, 500],
-                Decors: [0, 300, 400, 350, 300, 200, 280],
-                Words: 500
-            },
-            Levels: 0,
-            Form: 0,
-            Topping: 0,
-            Berries: 0,
-            Decor: 0,
-            Words: '',
-            Comments: '',
             Designed: false,
-
-            Name: '',
-            Phone: null,
-            Email: null,
-            Address: null,
-            Dates: null,
-            Time: null,
-            DelivComments: ''
         }
     },
     methods: {
         ToStep4() {
-            this.Designed = true
-            setTimeout(() => this.$refs.ToStep4.click(), 0);
+            const levels = document.querySelector('input[name="levels"]:checked');
+            const form = document.querySelector('input[name="form"]:checked');
+            const topping = document.querySelector('input[name="topping"]:checked');
+
+            if (!levels || !form || !topping) {
+                alert("⚠ Пожалуйста, выберите уровни, форму и топпинг перед продолжением.");
+                return;
+            }
+
+            this.Designed = true;
+
+            this.$nextTick(() => {
+                const cakeForm = document.getElementById("cake-form");
+                const orderForm = document.getElementById("order-form");
+
+                if (cakeForm && orderForm) {
+                    new FormData(cakeForm).forEach((value, key) => {
+                        let hidden = orderForm.querySelector(`[name="${key}"]`);
+                        if (!hidden) {
+                            hidden = document.createElement("input");
+                            hidden.type = "hidden";
+                            hidden.name = key;
+                            orderForm.appendChild(hidden);
+                        }
+                        hidden.value = value;
+                    });
+                }
+            });
         }
     },
-    computed: {
-        Cost() {
-            let W = this.Words ? this.Costs.Words : 0
-            return this.Costs.Levels[this.Levels] + this.Costs.Forms[this.Form] +
-                this.Costs.Toppings[this.Topping] + this.Costs.Berries[this.Berries] +
-                this.Costs.Decors[this.Decor] + W
+    mounted() {
+        function bindRadioUpdate(name, previewId) {
+            document.querySelectorAll(`input[name="${name}"]`).forEach(input => {
+                input.addEventListener("change", function () {
+                    const label = document.querySelector(`label[for="${this.id}"]`);
+                    document.getElementById(previewId).textContent = label ? label.textContent : this.value;
+                });
+            });
+        }
+
+        bindRadioUpdate("levels", "preview-levels");
+        bindRadioUpdate("form", "preview-form");
+        bindRadioUpdate("topping", "preview-topping");
+        bindRadioUpdate("berries", "preview-berries");
+        bindRadioUpdate("decorations", "preview-decor");
+
+        const textInput = document.querySelector('input[name="text"]');
+        if (textInput) {
+            textInput.addEventListener("input", function () {
+                document.getElementById("preview-text").textContent = this.value || "Без надписи";
+            });
         }
     }
-}).mount('#VueApp')
+}).mount('#VueApp');
+
+document.addEventListener("DOMContentLoaded", () => {
+
+    // модалка
+    function showModal(message) {
+        const modal = document.getElementById("success-modal");
+        if (!modal) return;
+
+        const content = modal.querySelector(".content");
+        if (content) {
+            content.textContent = message;
+        }
+
+        modal.style.display = "block";
+
+        setTimeout(() => {
+            modal.style.display = "none";
+            location.reload();
+        }, 2000);
+    }
+
+    // обработка формы заказа
+    document.getElementById("order-form").addEventListener("submit", async function (e) {
+        e.preventDefault();  // не даём форме перезагрузить страницу сама
+        const form = e.target;
+        const url = form.action;
+        const formData = new FormData(form);
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "X-CSRFToken": form.querySelector("[name=csrfmiddlewaretoken]").value
+                }
+            });
+
+            if (response.ok) {
+                // 🔹 если сервер вернул 200 — обновляем страницу
+                window.location.reload();
+            } else {
+                alert("❌ Ошибка на сервере");
+            }
+        } catch (err) {
+            console.error("Ошибка сети:", err);
+            alert("❌ Ошибка сети");
+        }
+    });
+});
