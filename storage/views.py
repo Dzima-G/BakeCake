@@ -128,5 +128,4 @@ def create_order(request):
         delivery_time=delivery_time,
         cost=cake.price,
     )
-
-    return redirect('storage:index')
+    return redirect('storage:lk_user')
