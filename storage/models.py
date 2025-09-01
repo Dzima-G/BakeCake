@@ -1,9 +1,12 @@
-from django.db import models
-from django.core.validators import MinValueValidator
-from django.utils import timezone
 from datetime import datetime, timedelta
-from users.models import CustomUser
 from decimal import Decimal
+
+from django.core.validators import MinValueValidator
+from django.db import models
+from django.utils import timezone
+from django.utils.crypto import get_random_string
+
+from users.models import CustomUser
 
 
 class Level(models.Model):
@@ -311,3 +314,19 @@ class Order(models.Model):
                 self.cost = (self.cost or Decimal('0')) * Decimal('1.2')
 
         super().save(*args, **kwargs)
+
+
+class ClickCounter(models.Model):
+    token = models.CharField(
+        max_length=20,
+        unique=True,
+        default=get_random_string(length=20)
+    )
+    clicks = models.PositiveIntegerField(default=0)
+
+    def __str__(self):
+        return f'{self.id}: {self.clicks} clicks'
+
+    class Meta:
+        verbose_name = 'реферальную ссылку'
+        verbose_name_plural = 'реферальные ссылки'

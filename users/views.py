@@ -1,12 +1,12 @@
-from django.shortcuts import redirect
-from django.http import JsonResponse
-from django.contrib.auth import get_user_model, login, update_session_auth_hash
-from django.views.decorators.http import require_POST
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import logout
 from django.contrib import messages
+from django.contrib.auth import (get_user_model, login, logout,
+                                 update_session_auth_hash)
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.views.decorators.http import require_POST
 
-from .forms import SignupForm, LoginForm
+from .forms import LoginForm, SignupForm
 
 User = get_user_model()
 

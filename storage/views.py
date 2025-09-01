@@ -1,12 +1,16 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.contrib.auth import login
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils import timezone
 
-from users.forms import SignupForm, LoginForm
+from users.forms import LoginForm, SignupForm
+
 from .forms import CakeForm
-from .models import Level, Form, Topping, Berry, Decoration, Cake, Order, CustomUser
+from .models import (Berry, Cake, CustomUser, Decoration, Form, Level, Order,
+                     Topping)
 
 
 def lk_user(request):
@@ -67,6 +71,9 @@ def index(request):
     else:
         form = CakeForm()
 
+    min_delivery_time = 15
+    min_dt = timezone.now() + timedelta(hours=min_delivery_time)
+
     context = {
         'form': form,
         'levels': Level.objects.all(),
@@ -78,6 +85,9 @@ def index(request):
         'signup_form': signup_form,
         'login_form': login_form,
         'cakes': cakes,
+        'min_date': min_dt.date(),
+        'min_time': min_dt.strftime('%H:%M'),
+        'text_price': 500,
     }
     return render(
         request,
@@ -90,13 +100,13 @@ def create_order(request):
     if request.method != 'POST':
         return JsonResponse({'ok': False, 'message': 'Неверный метод'}, status=405)
 
-    # 1. Собираем торт
+    # Собираем торт
     cake_form = CakeForm(request.POST)
     if not cake_form.is_valid():
         return JsonResponse({'ok': False, 'message': 'Ошибка в данных торта', 'errors': cake_form.errors}, status=400)
     cake = cake_form.save()
 
-    # 2. Если пользователь не авторизован — регистрируем его
+    # Если пользователь не авторизован — регистрируем его
     if not request.user.is_authenticated:
         signup_form = SignupForm(request.POST)
         if not signup_form.is_valid():
@@ -117,7 +127,21 @@ def create_order(request):
     delivery_date = datetime.strptime(delivery_date_str, '%Y-%m-%d').date() if delivery_date_str else None
     delivery_time = datetime.strptime(delivery_time_str, '%H:%M').time() if delivery_time_str else None
 
-    # 3. Создаём заказ
+    # валидация даты доставки
+    min_delivery_time = 15
+    if delivery_date and delivery_time:
+        selected_dt = datetime.combine(delivery_date, delivery_time)
+        selected_dt = timezone.make_aware(selected_dt, timezone.get_current_timezone())
+
+        min_allowed = timezone.now() + timedelta(hours=min_delivery_time)
+
+        if selected_dt < min_allowed:
+            return JsonResponse(
+                {'ok': False, 'message': 'Доставка возможна не ранее чем через 15 часов'},
+                status=400
+            )
+
+    # Создаём заказ
     order = Order.objects.create(
         user=user,
         cake=cake,
@@ -128,7 +152,11 @@ def create_order(request):
         delivery_time=delivery_time,
         cost=cake.price,
     )
-    return redirect('storage:lk_user')
+    return JsonResponse({
+        'ok': True,
+        'message': f"Заказ №{order.id} создан успешно!",
+        'redirect_url': reverse('storage:lk_user'),
+    })
 
 
 def create_order_catalog(request):

@@ -12,25 +12,27 @@
                 <span class="me-3 fs_40 cake_blue">Количество уровней</span>
                 {% for lvl in levels %}
                     <input type="radio" name="levels" id="lvl{{ lvl.id }}" value="{{ lvl.id }}" class="option-input">
-                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label"
-                           for="lvl{{ lvl.id }}">{{ lvl.amount }} ({{ lvl.price }} ₽)</label><br>
+                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="lvl{{ lvl.id }}" data-price="{{ lvl.price }}">
+                        {{ lvl.amount }}
+                    </label><br>
                 {% endfor %}
             </div>
             <div class="d-flex align-items-center flex-wrap mb-3">
                 <span class="me-3 fs_40 cake_blue">Форма</span>
                 {% for f in forms %}
                     <input type="radio" name="form" id="form{{ f.id }}" value="{{ f.id }}" class="option-input">
-                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="form{{ f.id }}">{{ f.name }}
-                        ({{ f.price }} ₽)</label><br>
+                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="form{{ f.id }}" data-price="{{ f.price }}">
+                        {{ f.name }}
+                    </label><br>
                 {% endfor %}
             </div>
             <div class="d-flex align-items-center flex-wrap mb-3">
                 <span class="me-3 fs_40 cake_blue">Топпинг</span>
                 {% for t in toppings %}
                     <input type="radio" name="topping" id="topping{{ t.id }}" value="{{ t.id }}" class="option-input">
-                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label"
-                           for="topping{{ t.id }}">{{ t.name }}
-                        ({{ t.price }} ₽)</label><br>
+                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="topping{{ t.id }}" data-price="{{ t.price }}">
+                        {{ t.name }}
+                    </label><br>
                 {% endfor %}
             </div>
             <h1 class="me-3 fs_40 cake_pink mb-3 mt-5">Дополнительно</h1>
@@ -39,25 +41,30 @@
                 <span class="me-3 fs_40 cake_blue">Ягоды</span>
                 {% for b in berries %}
                     <input type="radio" name="berries" id="berry{{ b.id }}" value="{{ b.id }}" class="option-input">
-                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="berry{{ b.id }}">{{ b.name }}
-                        ({{ b.price }} ₽)</label><br>
+                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="berry{{ b.id }}" data-price="{{ b.price }}">
+                        {{ b.name }}
+                    </label><br>
                 {% endfor %}
             </div>
             <div class="d-flex align-items-center flex-wrap mb-3">
                 <span class="me-3 fs_40 cake_blue">Декор</span>
                 {% for d in decorations %}
                     <input type="radio" name="decorations" id="decor{{ d.id }}" value="{{ d.id }}" class="option-input">
-                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="decor{{ d.id }}">{{ d.name }}
-                        ({{ d.price }} ₽)</label><br>
+                    <label class="mx-2 px-3 py-1 cake_grey cake__label option-label" for="decor{{ d.id }}" data-price="{{ d.price }}">
+                        {{ d.name }}
+                    </label><br>
                 {% endfor %}
             </div>
             <div class="row mb-3">
                 <div class="col-5 col-md-4 col-lg-3">
-                    <label class="me-3 fs_40 cake_blue" for="words">Надпись</label>
+                    <label class="me-3 fs_40 cake_blue" for="words">
+                        Надпись
+                    </label>
                 </div>
                 <div class="col-7 col-md-8 col-lg-9 pt-2">
                     <input type="text" name="text" placeholder="Например: «С днем рождения!»..."
-                           class="form-control cake__textinput">
+                           class="form-control cake__textinput" data-price="{{ text_price }}">
+
                 </div>
             </div>
             <div>
@@ -124,7 +131,7 @@
                         </div>
                     {% endif %}
 
-                    <div class="cake__card p-4 position-relative cake_grey">
+                    <div class="cake__card p-4 position-relative cake_grey col-12 col-lg-4 d-flex flex-column">
                         <span class="cake__badge rounded-pill">?</span>
                         <span>Количество уровней: <span id="preview-levels">—</span></span>
                         <span>Форма уровней: <span id="preview-form">—</span></span>
@@ -152,11 +159,9 @@
                         <input type="text" class="form-control my-3 cake__textinput" placeholder="Введите ваш адрес"
                                name="address" required>
                         <input type="date" class="form-control my-3 cake__textinput" placeholder="ДД.ММ.ГГ"
-                               name="delivery_date"
-                               required>
+                               name="delivery_date" required min="{{ min_date|date:'Y-m-d' }}" value="{{ min_date|date:'Y-m-d' }}">
                         <input type="time" class="form-control my-3 cake__textinput" placeholder="00:00"
-                               name="delivery_time"
-                               required>
+                               name="delivery_time" required min="{{ min_time }}" value="{{ min_time }}">
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -167,7 +172,7 @@
                     </div>
                     <div class="col-12 col-md-6 d-flex flex-column align-items-center align-items-md-end mt-3 mt-md-0">
                         <div class="d-flex">
-                            <span class="cake_pink fs_40 fw-bold me-2">Итого: ПОКА ПУСТО₽</span>
+                            <span id="preview-total" class="cake_pink fs_40 fw-bold me-2">Итого: 0 ₽</span>
                         </div>
                         <pre id="debug-hidden"></pre>
                         <button type="submit"

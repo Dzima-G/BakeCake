@@ -50,7 +50,7 @@ services:
       - .env
     volumes:
       - ./media:/app/media:rw
-      - ./staticfiles:/app/static:ro
+      - ./staticfiles:/app/staticfiles:ro
     ports:
       - "127.0.0.1:8000:8000"
     command: >
