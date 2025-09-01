@@ -10,7 +10,7 @@ from users.forms import LoginForm, SignupForm
 
 from .forms import CakeForm
 from .models import (Berry, Cake, CustomUser, Decoration, Form, Level, Order,
-                     Topping)
+                     Topping, PromoCode)
 
 
 def lk_user(request):
@@ -141,6 +141,11 @@ def create_order(request):
                 status=400
             )
 
+    raw_code = (request.POST.get('promo') or '').strip()
+    promo = None
+    if raw_code:
+        promo = PromoCode.objects.filter(code__iexact=raw_code).first()
+
     # Создаём заказ
     order = Order.objects.create(
         user=user,
@@ -151,6 +156,7 @@ def create_order(request):
         delivery_date=delivery_date,
         delivery_time=delivery_time,
         cost=cake.price,
+        promo=promo,
     )
     return JsonResponse({
         'ok': True,
@@ -214,6 +220,11 @@ def create_order_catalog(request):
     delivery_date = datetime.strptime(delivery_date_str, '%Y-%m-%d').date() if delivery_date_str else None
     delivery_time = datetime.strptime(delivery_time_str, '%H:%M').time() if delivery_time_str else None
 
+    raw_code = (request.POST.get('promo') or '').strip()
+    promo = None
+    if raw_code:
+        promo = PromoCode.objects.filter(code__iexact=raw_code).first()
+
     # Создаём заказ
     order = Order.objects.create(
         user=user,
@@ -224,6 +235,7 @@ def create_order_catalog(request):
         delivery_date=delivery_date,
         delivery_time=delivery_time,
         cost=final_price,
+        promo=promo,
     )
 
     return redirect('storage:lk_user')

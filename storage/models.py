@@ -3,6 +3,8 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import UniqueConstraint
+from django.db.models.functions import Lower
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 
@@ -284,6 +286,13 @@ class Order(models.Model):
         auto_now_add=True,
         verbose_name='Дата создания'
     )
+    promo = models.ForeignKey(
+        'PromoCode',
+        null=True, blank=True,
+        on_delete=models.SET_NULL,
+        related_name='orders',
+        verbose_name='Промокод'
+    )
 
     class Meta:
         verbose_name = 'заказ'
@@ -330,3 +339,17 @@ class ClickCounter(models.Model):
     class Meta:
         verbose_name = 'реферальную ссылку'
         verbose_name_plural = 'реферальные ссылки'
+
+
+class PromoCode(models.Model):
+    code = models.CharField('Код', max_length=32, db_index=True)
+
+    class Meta:
+        verbose_name = 'Промокод'
+        verbose_name_plural = 'Промокоды'
+        constraints = [
+            UniqueConstraint(Lower('code'), name='uniq_promocode_code_lower'),
+        ]
+
+    def __str__(self):
+        return self.code

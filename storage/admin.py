@@ -1,9 +1,10 @@
 from django.conf import settings
 from django.contrib import admin
 from django.utils.html import format_html
+from django.db.models import Count, Sum
 
 from .models import (Berry, Cake, ClickCounter, Courier, Decoration, Form,
-                     Level, Order, Topping)
+                     Level, Order, Topping, PromoCode)
 
 
 @admin.register(Cake)
@@ -113,3 +114,23 @@ class ClickCounterAdmin(admin.ModelAdmin):
         )
 
     referral_link.short_description = "Реферальная ссылка"
+
+
+@admin.register(PromoCode)
+class PromoCodeAdmin(admin.ModelAdmin):
+    list_display = ('code', 'orders_count', 'orders_sum')
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        return qs.annotate(
+            _orders_count=Count('orders', distinct=True),
+            _orders_sum=Sum('orders__cost')
+        )
+
+    def orders_count(self, obj):
+        return obj._orders_count or 0
+    orders_count.short_description = 'Кол-во заказов'
+
+    def orders_sum(self, obj):
+        return obj._orders_sum or 0
+    orders_sum.short_description = 'Сумма заказов'

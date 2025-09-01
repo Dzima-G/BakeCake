@@ -58,6 +58,11 @@
                                        placeholder="Например: «С днем рождения!»" value="{{ cake.text|default:'' }}">
                             </div>
                             
+                            <div class="mb-3">
+                                <label class="form-label cake_blue">Промокод</label>
+                                <input type="text" name="promo" class="form-control cake-input" placeholder="Введите промокод">
+                            </div>
+
                             <div class="mb-4">
                                 <label class="form-label cake_blue">Комментарий к заказу</label>
                                 <textarea name="order_notes" rows="2" class="form-control cake-input" placeholder="Ваши пожелания..."></textarea>
