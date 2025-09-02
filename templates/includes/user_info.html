@@ -134,7 +134,11 @@
                                             <span class="cake_blue">Ягоды: {{ order.berries_label }}</span><br>
                                             <span class="cake_blue">Декор: {{ order.decorations_label }}</span><br>
                                             <span class="cake_blue">Надпись: {{ order.text_label }}</span><br>
-                                            <span class="cake_pink">Цена: {{ order.cake.price }}₽</span>
+                                            {% if order.promo %}
+                                              <span class="cake_blue">Промокод: {{ order.promo.code }}</span><br>
+                                              <span class="cake_blue">Скидка: −{{ order.promo.discount_value|floatformat:0 }}₽</span><br>
+                                            {% endif %}
+                                            <span class="cake_pink">Итого к оплате: {{ order.cost|floatformat:0 }}₽</span>
                                         </div>
                                         <div class="modal-footer d-flex justify-content-between">
                                             <span class="cake_blue d-flex">Статус: {{ order.get_status_display }}</span>

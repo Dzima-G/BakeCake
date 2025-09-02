@@ -118,7 +118,7 @@ class ClickCounterAdmin(admin.ModelAdmin):
 
 @admin.register(PromoCode)
 class PromoCodeAdmin(admin.ModelAdmin):
-    list_display = ('code', 'orders_count', 'orders_sum')
+    list_display = ('code', 'discount_value', 'orders_count', 'orders_sum')
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

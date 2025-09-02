@@ -302,26 +302,17 @@ class Order(models.Model):
     def __str__(self):
         return f'{self.cake} - {self.address}'
 
+    def _compute_final_cost(self) -> Decimal:
+        base = self.cake.price or Decimal('0')
+
+        # скидка по промокоду
+        if self.promo and (self.promo.discount_value or Decimal('0')) > 0:
+            base = max(Decimal('0'), base - self.promo.discount_value)
+
+        return base
+
     def save(self, *args, **kwargs):
-
-        if not self.cost and self.cake:
-            self.cost = self.cake.price
-
-        if self.delivery_date and self.delivery_time:
-            delivery_dt = datetime.combine(
-                self.delivery_date,
-                self.delivery_time
-            )
-            if timezone.is_naive(delivery_dt):
-                delivery_dt = timezone.make_aware(
-                    delivery_dt,
-                    timezone.get_current_timezone()
-                )
-
-            delta = delivery_dt - timezone.now()
-            if timedelta(0) < delta <= timedelta(hours=24):
-                self.cost = (self.cost or Decimal('0')) * Decimal('1.2')
-
+        self.cost = self._compute_final_cost()
         super().save(*args, **kwargs)
 
 
@@ -343,6 +334,10 @@ class ClickCounter(models.Model):
 
 class PromoCode(models.Model):
     code = models.CharField('Код', max_length=32, db_index=True)
+    discount_value = models.DecimalField(
+        'Скидка', max_digits=10, decimal_places=2,
+        default=0, validators=[MinValueValidator(0)]
+    )
 
     class Meta:
         verbose_name = 'Промокод'

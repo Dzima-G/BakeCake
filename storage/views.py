@@ -21,6 +21,10 @@ def lk_user(request):
         order.berries_label = order.cake.berries.name if order.cake.berries else 'Без ягод'
         order.decorations_label = order.cake.decorations.name if order.cake.decorations else 'Без декора'
         order.text_label = (order.cake.text or '').strip() or 'Без надписи'
+
+        order.promo_code = order.promo.code if order.promo else ''
+        order.promo_discount_value = order.promo.discount_value if order.promo else 0
+
     context = {
         'orders': orders,
         'has_orders': orders.exists()
